@@ -8,6 +8,13 @@ dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Enable CORS with options
+  app.enableCors({
+    origin: 'http://localhost:3000', // Allow only this origin
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow these methods
+    credentials: true, // Allow credentials
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Calf Care API')
     .setDescription('The Calf Care API')
