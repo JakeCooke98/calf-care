@@ -7,8 +7,8 @@ import Navigation from './components/Navigation';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Calf Care Dashboard",
-  description: "Monitor and manage your calf care data",
+  title: "Calf Care",
+  description: "Monitor and manage your calf data",
 };
 
 export default function RootLayout({
