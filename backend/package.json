@@ -1,7 +1,7 @@
 {
-  "name": "calf-care",
+  "name": "calf-care-backend",
   "version": "0.0.1",
-  "description": "Calf Care App",
+  "description": "Calf Care API",
   "author": "Jake Cooke",
   "private": true,
   "license": "UNLICENSED",
