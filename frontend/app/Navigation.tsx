@@ -61,11 +61,6 @@ export default function Navigation() {
           ))}
         </nav>
         <div className="ml-auto flex items-center space-x-4">
-          <Input
-            type="search"
-            placeholder="Search..."
-            className="w-64 bg-secondary"
-          />
           {session ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

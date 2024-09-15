@@ -12,13 +12,27 @@ import {
 import { Button } from "@/components/ui/button";
 import { Calf } from "./calves-table";
 
-export function WatchlistTable() {
+interface WatchlistTableProps {
+  searchQuery: string;
+}
+
+export function WatchlistTable({ searchQuery }: WatchlistTableProps) {
   const [watchlistCalves, setWatchlistCalves] = useState<Calf[]>([]);
+  const [filteredWatchlist, setFilteredWatchlist] = useState<Calf[]>([]);
 
   useEffect(() => {
     const storedWatchlist = JSON.parse(localStorage.getItem("watchlist") || "[]");
     setWatchlistCalves(storedWatchlist);
   }, []);
+
+  useEffect(() => {
+    const filtered = watchlistCalves.filter((calf) =>
+      Object.values(calf).some((value) =>
+        value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
+    setFilteredWatchlist(filtered);
+  }, [searchQuery, watchlistCalves]);
 
   const removeFromWatchlist = (calfId: number) => {
     const updatedWatchlist = watchlistCalves.filter((calf) => calf.id !== calfId);
@@ -39,7 +53,7 @@ export function WatchlistTable() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {watchlistCalves.map((calf) => (
+        {filteredWatchlist.map((calf) => (
           <TableRow key={calf.id}>
             <TableCell>{calf.id}</TableCell>
             <TableCell>{calf.name}</TableCell>

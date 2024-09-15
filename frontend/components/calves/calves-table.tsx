@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -26,9 +26,23 @@ const initialCalvesData: Calf[] = [
   { id: 3, name: "Molly", age: 4, weight: 140, health: "Fair" },
 ];
 
-export function CalvesTable() {
+interface CalvesTableProps {
+  searchQuery: string;
+}
+
+export function CalvesTable({ searchQuery }: CalvesTableProps) {
   const [calvesData, setCalvesData] = useState<Calf[]>(initialCalvesData);
+  const [filteredCalves, setFilteredCalves] = useState<Calf[]>(initialCalvesData);
   const [selectedCalves, setSelectedCalves] = useState<number[]>([]);
+
+  useEffect(() => {
+    const filtered = calvesData.filter((calf) =>
+      Object.values(calf).some((value) =>
+        value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
+    setFilteredCalves(filtered);
+  }, [searchQuery, calvesData]);
 
   const toggleCalfSelection = (calfId: number) => {
     setSelectedCalves((prev) =>
@@ -71,7 +85,7 @@ export function CalvesTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {calvesData.map((calf) => (
+          {filteredCalves.map((calf) => (
             <TableRow key={calf.id}>
               <TableCell>
                 <Checkbox
