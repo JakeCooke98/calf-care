@@ -1,4 +1,3 @@
- 
 import { Injectable } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
@@ -45,7 +44,7 @@ export class UsersService {
     return bcrypt.compare(password, user.password);
   }
 
-  async findByEmail(email: string) {
-    return this.usersRepository.findOne({ where: { email: (email) } });
+  async findByEmail(email: string): Promise<User | undefined> {
+    return this.usersRepository.findOne({ where: { email } });
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -14,6 +14,9 @@ export class AuthService {
 
   async signUp(signUpDto: SignUpDto) {
     const { password, ...userData } = signUpDto;
+    if (!password) {
+      throw new BadRequestException('Password is required');
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await this.usersService.create({
       ...userData,
@@ -23,17 +26,45 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.usersService.findByEmail(loginDto.email);
+    const user = await this.validateUser(loginDto.email, loginDto.password);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
     const payload = { sub: user.id, email: user.email };
+    const access_token = this.jwtService.sign(payload);
     return {
-      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        image: null, // or a default image URL if you want
+      },
+      access_token,
     };
+  }
+
+  async validateUser(email: string, password: string): Promise<any> {
+    console.log('Attempting to validate user:', email);
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      console.log('User not found');
+      return null;
+    }
+    if (!user.password) {
+      console.log('User has no password set');
+      return null;
+    }
+    try {
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (isPasswordValid) {
+        console.log('User validated successfully');
+        const { password, ...result } = user;
+        return result;
+      }
+    } catch (error) {
+      console.error('Error comparing passwords:', error);
+    }
+    console.log('User validation failed');
+    return null;
   }
 }
