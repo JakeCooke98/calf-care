@@ -1,4 +1,4 @@
-import Navigation from '@/app/components/Navigation';
+import Navigation from '@/app/Navigation';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalvesTable } from "@/components/calves/calves-table";
 

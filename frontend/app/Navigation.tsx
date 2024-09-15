@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useSession, signOut } from "next-auth/react"
+import { usePathname } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,9 +15,18 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import { cn } from "@/lib/utils"
 
 export default function Navigation() {
   const { data: session } = useSession()
+  const pathname = usePathname()
+
+  const navItems = [
+    { name: "Overview", href: "/dashboard" },
+    { name: "Details", href: "/details" },
+    { name: "Watchlist", href: "/watchlist" },
+    { name: "Settings", href: "/settings" },
+  ]
 
   return (
     <div className="border-b bg-background text-foreground shadow-sm">
@@ -26,18 +36,20 @@ export default function Navigation() {
           <span className="text-xl font-bold ml-2 text-foreground">Calf Care</span>
         </Link>
         <nav className="flex items-center space-x-4 lg:space-x-6 mx-6">
-          <Link href="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
-            Overview
-          </Link>
-          <Link href="/details" className="text-sm font-medium transition-colors hover:text-primary">
-            Details
-          </Link>
-          <Link href="/watchlist" className="text-sm font-medium transition-colors hover:text-primary">
-            Watchlist
-          </Link>
-          <Link href="/settings" className="text-sm font-medium transition-colors hover:text-primary">
-            Settings
-          </Link>
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "text-sm font-medium transition-colors",
+                pathname === item.href
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-primary"
+              )}
+            >
+              {item.name}
+            </Link>
+          ))}
         </nav>
         <div className="ml-auto flex items-center space-x-4">
           <Input
@@ -55,7 +67,7 @@ export default function Navigation() {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-white" align="end" forceMount>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">{session.user?.name}</p>

@@ -8,7 +8,7 @@ import NewCalvesToday from '@/components/dashboard/NewCalvesToday';
 import AverageWeight from '@/components/dashboard/AverageWeight';
 import TodoList from '@/components/dashboard/TodoList';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
-import Navigation from '@/app/components/Navigation';
+import Navigation from '@/app/Navigation';
 
 const BreedDistribution = dynamic(() => import('@/components/dashboard/BreedDistribution'), { ssr: false });
 const GenderDistribution = dynamic(() => import('@/components/dashboard/GenderDistribution'), { ssr: false });
