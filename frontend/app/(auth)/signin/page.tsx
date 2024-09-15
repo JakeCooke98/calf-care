@@ -41,7 +41,7 @@ export default function SignInPage() {
               Sign in to your account
             </h1>
             <p className="text-sm text-muted-foreground">
-              Enter your email below to sign in to your account
+              Enter your details below to sign in to your account
             </p>
           </div>
           <UserAuthForm />

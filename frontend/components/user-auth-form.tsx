@@ -165,7 +165,7 @@ export function UserAuthForm({ className, isSignUp = false, ...props }: UserAuth
             {isLoading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
-            {isSignUp ? "Sign Up" : "Sign In"} with Email
+            {isSignUp ? "Sign Up" : "Sign In"}
           </button>
         </div>
       </form>

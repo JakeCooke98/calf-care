@@ -28,6 +28,15 @@ export default function Navigation() {
     { name: "Settings", href: "/settings" },
   ]
 
+  // Function to generate UI Avatar URL
+  const getAvatarUrl = (name: string, email: string) => {
+    const encodedName = encodeURIComponent(name || 'User');
+    // Use a muted color for the background
+    const backgroundColor = '64748b'; // This is a muted slate color, adjust if needed
+    const foregroundColor = 'ffffff'; // White text for contrast
+    return `https://ui-avatars.com/api/?name=${encodedName}&background=${backgroundColor}&color=${foregroundColor}&size=128&length=2&email=${encodeURIComponent(email)}`;
+  }
+
   return (
     <div className="border-b bg-background text-foreground shadow-sm">
       <div className="flex h-16 items-center px-4 max-w-7xl mx-auto">
@@ -62,7 +71,10 @@ export default function Navigation() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={session.user?.image || "/avatars/01.png"} alt={session.user?.name || "@username"} />
+                    <AvatarImage 
+                      src={session.user?.image || getAvatarUrl(session.user?.name || '', session.user?.email || '')}
+                      alt={session.user?.name || "User"}
+                    />
                     <AvatarFallback>{session.user?.name?.[0] || "U"}</AvatarFallback>
                   </Avatar>
                 </Button>
