@@ -5,7 +5,14 @@ import CredentialsProvider from "next-auth/providers/credentials"
 // Extend the built-in session types
 declare module "next-auth" {
   interface Session extends DefaultSession {
-    accessToken?: string
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      image?: string | null;
+    }
+     & DefaultSession["user"]
+    accessToken?: string;
   }
   interface User {
     accessToken?: string
@@ -30,25 +37,33 @@ export default NextAuth({
           body: JSON.stringify(credentials),
           headers: { "Content-Type": "application/json" }
         })
-        const user = await res.json()
+        const data = await res.json()
 
-        if (res.ok && user) {
-          return user
+        if (res.ok && data.user) {
+          return { ...data.user, accessToken: data.access_token }
         }
         return null
       }
     })
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user?.accessToken) {
-        token.accessToken = user.accessToken
+    async jwt({ token, user, account }) {
+      if (user) {
+        token.id = user.id
+        token.name = user.name
+        token.email = user.email
+        token.picture = user.image || null
+        token.accessToken = user.accessToken || account?.access_token
       }
       return token
     },
     async session({ session, token }) {
-      session.accessToken = token.accessToken as string | undefined;
-      return session;
+      session.user.id = token.id as string
+      session.user.name = token.name as string
+      session.user.email = token.email as string
+      session.user.image = token.picture as string | null
+      session.accessToken = token.accessToken as string | undefined
+      return session
     }
   },
   pages: {
