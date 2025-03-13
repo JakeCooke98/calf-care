@@ -12,8 +12,15 @@ Calf Care is a comprehensive management system designed to help dairy farmers an
 - **Watchlist**: Keep track of calves that require special attention or monitoring.
 - **User Authentication**: Secure sign-up and sign-in functionality for farm managers and staff.
 
-## Dashboard Example
-
+## Example Dashboard
+- Login/Signup page
+![Alt text](/screenshots/SignIn_Example.png?raw=true "Login/Signup Page")
+- Dashboard
+![Alt text](/screenshots/Dashboard_Example.png?raw=true "Dashboard Page")
+- Details
+![Alt text](/screenshots/Details_Example.png?raw=true "Details Page")
+- Watchlist
+![Alt text](/screenshots/Watchlist_Example.png?raw=true "Watchlist Page")
 
 ## Tech Stack
 
