@@ -12,6 +12,9 @@ Calf Care is a comprehensive management system designed to help dairy farmers an
 - **Watchlist**: Keep track of calves that require special attention or monitoring.
 - **User Authentication**: Secure sign-up and sign-in functionality for farm managers and staff.
 
+## Dashboard Example
+
+
 ## Tech Stack
 
 ### Frontend
@@ -56,23 +59,31 @@ Calf Care is a comprehensive management system designed to help dairy farmers an
 
 4. Set up environment variables:
    - Create a `.env` file in the backend directory
+   - Create a `.env` file in the frontend directory
    - Add necessary environment variables (database connection, JWT secret, etc.)
+  
+5. Start the Database:
+   - Ensure Docker is running on your device
+   - ```
+     cd backend
+     docker compose up -d
+     ```
+   - Check docker logs to ensure DB has booted up sucessfully 
 
-5. Start the development servers:
-   
-   Frontend:
-   ```
-   cd frontend
-   npm run dev
-   ```
+7. Start the development servers:
    
    Backend:
    ```
    cd backend
    npm run start:dev
    ```
+   Frontend:
+   ```
+   cd frontend
+   npm run dev
+   ```
 
-6. Open your browser and navigate to `http://localhost:3000` to view the application.
+8. Open your browser and navigate to `http://localhost:3000` to view the application.
 
 ## License
 
