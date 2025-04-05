@@ -24,7 +24,7 @@ export class CalvesController {
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Calf> {
-    return this.calvesService.findOne(+id);
+    return this.calvesService.findOne(id);
   }
 
   @Put(':id')
@@ -32,11 +32,22 @@ export class CalvesController {
     @Param('id') id: string,
     @Body() updateCalfDto: UpdateCalfDto,
   ): Promise<Calf> {
-    return this.calvesService.update(+id, updateCalfDto);
+    return this.calvesService.update(id, updateCalfDto);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
-    return this.calvesService.remove(+id);
+    return this.calvesService.remove(id);
+  }
+
+  @Get('alive/:status')
+  async findByAliveStatus(@Param('status') status: string): Promise<Calf[]> {
+    const isAlive = status === 'true';
+    return this.calvesService.findByAliveStatus(isAlive);
+  }
+  
+  @Get('location/:location')
+  async findByLocation(@Param('location') location: string): Promise<Calf[]> {
+    return this.calvesService.findByLocation(location);
   }
 } 

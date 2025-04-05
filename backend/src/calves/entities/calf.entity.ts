@@ -2,8 +2,8 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
 export class Calf {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   name: string;
@@ -25,6 +25,12 @@ export class Calf {
 
   @Column({ default: false })
   inWatchlist: boolean;
+
+  @Column({ nullable: true })
+  location: string;
+
+  @Column({ default: true })
+  isAlive: boolean;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

@@ -20,7 +20,7 @@ export class CalvesService {
     return this.calvesRepository.find();
   }
 
-  async findOne(id: number): Promise<Calf> {
+  async findOne(id: string): Promise<Calf> {
     const calf = await this.calvesRepository.findOne({ where: { id } });
     if (!calf) {
       throw new NotFoundException(`Calf with ID ${id} not found`);
@@ -28,18 +28,26 @@ export class CalvesService {
     return calf;
   }
 
-  async update(id: number, updateCalfDto: UpdateCalfDto): Promise<Calf> {
+  async update(id: string, updateCalfDto: UpdateCalfDto): Promise<Calf> {
     const calf = await this.findOne(id);
     this.calvesRepository.merge(calf, updateCalfDto);
     return this.calvesRepository.save(calf);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const calf = await this.findOne(id);
     await this.calvesRepository.remove(calf);
   }
 
   async findByWatchlist(inWatchlist: boolean): Promise<Calf[]> {
     return this.calvesRepository.find({ where: { inWatchlist } });
+  }
+
+  async findByAliveStatus(isAlive: boolean): Promise<Calf[]> {
+    return this.calvesRepository.find({ where: { isAlive } });
+  }
+  
+  async findByLocation(location: string): Promise<Calf[]> {
+    return this.calvesRepository.find({ where: { location } });
   }
 } 

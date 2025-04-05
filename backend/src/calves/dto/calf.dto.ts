@@ -13,20 +13,29 @@ export class CreateCalfDto {
   @IsNumber()
   weight: number;
 
-  @IsOptional()
   @IsNotEmpty()
   @IsString()
   health: string;
 
+  @IsOptional()
   @IsString()
-  breed: string;
+  breed?: string;
 
+  @IsOptional()
   @IsString()
-  gender: string;
+  gender?: string;
 
   @IsOptional()
   @IsBoolean()
   inWatchlist?: boolean;
+  
+  @IsOptional()
+  @IsString()
+  location?: string;
+  
+  @IsOptional()
+  @IsBoolean()
+  isAlive?: boolean;
 }
 
 export class UpdateCalfDto {
@@ -57,4 +66,12 @@ export class UpdateCalfDto {
   @IsOptional()
   @IsBoolean()
   inWatchlist?: boolean;
+  
+  @IsOptional()
+  @IsString()
+  location?: string;
+  
+  @IsOptional()
+  @IsBoolean()
+  isAlive?: boolean;
 }
