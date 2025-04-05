@@ -18,13 +18,19 @@ interface CalvesTableWatchlistProps {
 }
 
 export function CalvesTable({ calves, isLoading, searchQuery }: CalvesTableWatchlistProps) {
-  // Filter calves based on search query
-  const filteredCalves = calves.filter(calf => 
-    calf.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    calf.breed?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    calf.health.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    calf.location?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Updated filter function to include numeric fields
+  const filteredCalves = calves.filter(calf => {
+    const query = searchQuery.toLowerCase();
+    return (
+      calf.name.toLowerCase().includes(query) ||
+      calf.breed?.toLowerCase().includes(query) ||
+      calf.health.toLowerCase().includes(query) ||
+      calf.location?.toLowerCase().includes(query) ||
+      // Convert numeric values to strings for searching
+      calf.age.toString().includes(query) ||
+      calf.weight.toString().includes(query)
+    );
+  });
 
   return (
     <div className="rounded-md border">
