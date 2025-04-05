@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { 
   Table, 
   TableHeader, 
@@ -9,36 +8,16 @@ import {
   TableBody, 
   TableCell 
 } from "@/components/ui/table";
-import { Calf, calvesApi } from "@/lib/api-client";
+import { Calf } from "@/lib/api-client";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface CalvesTableProps {
+interface CalvesTableWatchlistProps {
+  calves: Calf[];
+  isLoading: boolean;
   searchQuery: string;
 }
 
-export function CalvesTable({ searchQuery }: CalvesTableProps) {
-  const [calves, setCalves] = useState<Calf[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchCalves = async () => {
-      try {
-        setIsLoading(true);
-        const data = await calvesApi.getAll();
-        setCalves(data);
-        setError(null);
-      } catch (err) {
-        console.error("Failed to fetch calves:", err);
-        setError("Failed to load calves. Please try again later.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCalves();
-  }, []);
-
+export function CalvesTable({ calves, isLoading, searchQuery }: CalvesTableWatchlistProps) {
   // Filter calves based on search query
   const filteredCalves = calves.filter(calf => 
     calf.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -46,20 +25,6 @@ export function CalvesTable({ searchQuery }: CalvesTableProps) {
     calf.health.toLowerCase().includes(searchQuery.toLowerCase()) ||
     calf.location?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  if (error) {
-    return (
-      <div className="p-4 rounded-md bg-red-50 text-red-500">
-        <p>{error}</p>
-        <button 
-          onClick={() => window.location.reload()} 
-          className="mt-2 text-sm underline"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div className="rounded-md border">
@@ -73,13 +38,13 @@ export function CalvesTable({ searchQuery }: CalvesTableProps) {
             <TableHead>Breed</TableHead>
             <TableHead>Location</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Watchlist</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
             // Loading skeleton
-            Array(5).fill(0).map((_, index) => (
+            Array(3).fill(0).map((_, index) => (
               <TableRow key={`loading-${index}`}>
                 {Array(8).fill(0).map((_, cellIndex) => (
                   <TableCell key={`cell-${index}-${cellIndex}`}>
@@ -91,7 +56,7 @@ export function CalvesTable({ searchQuery }: CalvesTableProps) {
           ) : filteredCalves.length === 0 ? (
             <TableRow>
               <TableCell colSpan={8} className="text-center py-6 text-muted-foreground">
-                No calves found.
+                No calves in watchlist{searchQuery ? " matching search criteria" : ""}.
               </TableCell>
             </TableRow>
           ) : (
@@ -123,11 +88,16 @@ export function CalvesTable({ searchQuery }: CalvesTableProps) {
                   </span>
                 </TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    calf.inWatchlist ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'
-                  }`}>
-                    {calf.inWatchlist ? 'Watching' : 'Normal'}
-                  </span>
+                  <button 
+                    className="text-blue-500 hover:text-blue-700 text-sm"
+                    onClick={() => {
+                      // This would be implemented to remove from watchlist
+                      // Will need a modal confirmation
+                      console.log('Remove from watchlist:', calf.id);
+                    }}
+                  >
+                    Remove
+                  </button>
                 </TableCell>
               </TableRow>
             ))
@@ -136,4 +106,4 @@ export function CalvesTable({ searchQuery }: CalvesTableProps) {
       </Table>
     </div>
   );
-}
+} 
