@@ -35,21 +35,24 @@ async function fetchApi<T>(
     },
   });
   
-  const data = await response.json();
-  
   if (!response.ok) {
-    throw new ApiError(
-      data.message || 'An error occurred while fetching data',
-      response.status
-    );
+    let errorMessage = 'An error occurred';
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.message || errorMessage;
+    } catch (e) {
+      // If parsing JSON fails, use status text
+      errorMessage = response.statusText || errorMessage;
+    }
+    throw new Error(`API Error (${response.status}): ${errorMessage}`);
   }
   
-  return data as T;
+  return response.json() as Promise<T>;
 }
 
 // Type definitions
 export interface Calf {
-  id: number;
+  id: string;  // or number, depending on your backend
   name: string;
   age: number;
   weight: number;
@@ -61,6 +64,22 @@ export interface Calf {
   inWatchlist: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+// Types for dashboard data
+export interface DashboardStats {
+  totalCount: number;
+  oneDayOldCount: number; // Count of calves born yesterday (1 day old)
+  twoDayOldCount: number; // Count of calves born two days ago (2 days old)
+  watchlistCount: number;
+  aliveCount: number;
+  deceasedCount: number;
+  averageWeight: number;
+}
+
+export interface ChartDataPoint {
+  name: string;
+  value: number;
 }
 
 // API endpoints for calves
@@ -112,6 +131,72 @@ export const calvesApi = {
   getByLocation: async (location: string): Promise<Calf[]> => {
     return fetchApi<Calf[]>(`/calves/location/${encodeURIComponent(location)}`);
   },
+  
+  // Get dashboard statistics
+  getStats: async (): Promise<DashboardStats> => {
+    return fetchApi<DashboardStats>('/calves/stats');
+  },
+  
+  // Get recent calves
+  getRecentCalves: async (days: number = 7): Promise<Calf[]> => {
+    return fetchApi<Calf[]>(`/calves/recent?days=${days}`);
+  },
+  
+  // Get health distribution
+  getHealthDistribution: async (): Promise<ChartDataPoint[]> => {
+    return fetchApi<ChartDataPoint[]>('/calves/health-distribution');
+  },
+  
+  // Get breed distribution
+  getBreedDistribution: async (): Promise<ChartDataPoint[]> => {
+    return fetchApi<ChartDataPoint[]>('/calves/breed-distribution');
+  },
+  
+  // Get gender distribution
+  getGenderDistribution: async (): Promise<ChartDataPoint[]> => {
+    return fetchApi<ChartDataPoint[]>('/calves/gender-distribution');
+  },
+  
+  // Get location distribution
+  getLocationDistribution: async (): Promise<ChartDataPoint[]> => {
+    return fetchApi<ChartDataPoint[]>('/calves/location-distribution');
+  },
+  
+  // Get age distribution
+  getAgeDistribution: async (): Promise<ChartDataPoint[]> => {
+    return fetchApi<ChartDataPoint[]>('/calves/age-distribution');
+  },
+};
+
+// Dashboard-specific endpoints
+export const dashboardApi = {
+  getStats: async (): Promise<DashboardStats> => {
+    return fetchApi<DashboardStats>('/calves/stats');
+  },
+  
+  getRecentCalves: async (days: number = 7): Promise<Calf[]> => {
+    return fetchApi<Calf[]>(`/calves/recent?days=${days}`);
+  },
+  
+  getHealthDistribution: async (): Promise<ChartDataPoint[]> => {
+    return fetchApi<ChartDataPoint[]>('/calves/health-distribution');
+  },
+  
+  getBreedDistribution: async (): Promise<ChartDataPoint[]> => {
+    return fetchApi<ChartDataPoint[]>('/calves/breed-distribution');
+  },
+  
+  getGenderDistribution: async (): Promise<ChartDataPoint[]> => {
+    return fetchApi<ChartDataPoint[]>('/calves/gender-distribution');
+  },
+  
+  getLocationDistribution: async (): Promise<ChartDataPoint[]> => {
+    return fetchApi<ChartDataPoint[]>('/calves/location-distribution');
+  },
+  
+  getAgeDistribution: async (): Promise<ChartDataPoint[]> => {
+    return fetchApi<ChartDataPoint[]>('/calves/age-distribution');
+  },
 };
 
 // Export other API services as needed (authentication, etc.)
@@ -123,4 +208,5 @@ export const authApi = {
 export default {
   calves: calvesApi,
   auth: authApi,
+  dashboard: dashboardApi,
 }; 
