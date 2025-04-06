@@ -179,6 +179,43 @@ export class CalvesService {
     return distribution;
   }
 
+  async getDailyBirthRate(days: number = 7) {
+    // Calculate the date for 7 days ago from now
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    startDate.setHours(0, 0, 0, 0); // Set to midnight
+    
+    // Get all calves created in the last 7 days
+    const recentCalves = await this.calvesRepository
+      .createQueryBuilder('calf')
+      .where('calf.createdAt >= :startDate', { startDate })
+      .orderBy('calf.createdAt', 'ASC')
+      .getMany();
+    
+    // Initialize result object with dates for the last 7 days
+    const dailyCounts: { [key: string]: number } = {};
+    for (let i = 0; i < days; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() - (days - 1 - i));
+      const dateString = date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+      dailyCounts[dateString] = 0;
+    }
+    
+    // Count calves born each day
+    recentCalves.forEach(calf => {
+      const birthDate = calf.createdAt.toISOString().split('T')[0];
+      if (dailyCounts[birthDate] !== undefined) {
+        dailyCounts[birthDate]++;
+      }
+    });
+    
+    // Convert to array format for the frontend
+    return Object.entries(dailyCounts).map(([date, count]) => ({
+      name: date,
+      value: count
+    }));
+  }
+
   async searchCalves(params: SearchParams) {
     const { 
       page, 

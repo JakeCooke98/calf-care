@@ -59,6 +59,13 @@ export class CalvesController {
     return this.calvesService.getAgeDistribution();
   }
 
+  @Get('daily-birth-rate')
+  @ApiQuery({ name: 'days', required: false, type: Number, description: 'Number of days to include', example: 7 })
+  async getDailyBirthRate(@Query('days') days?: string) {
+    const parsedDays = days ? parseInt(days, 10) : 7;
+    return this.calvesService.getDailyBirthRate(parsedDays);
+  }
+
   @Get('search')
   @ApiOperation({ summary: 'Search and filter calves with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (starts at 1)', example: 1 })
