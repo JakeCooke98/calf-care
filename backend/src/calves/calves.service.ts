@@ -216,6 +216,75 @@ export class CalvesService {
     }));
   }
 
+  async getMonthlyMortalityRates(months: number = 6) {
+    // Calculate the start date (6 months ago)
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - months);
+    startDate.setDate(1); // First day of that month
+    startDate.setHours(0, 0, 0, 0); // Set to midnight
+    
+    // Get all deceased calves with their death dates
+    const deceasedCalves = await this.calvesRepository
+      .createQueryBuilder('calf')
+      .where('calf.isAlive = :isAlive', { isAlive: false })
+      .andWhere('calf.updatedAt >= :startDate', { startDate })
+      .orderBy('calf.updatedAt', 'ASC')
+      .getMany();
+    
+    // Get monthly totals of all calves for percentage calculation
+    const monthlyTotals: { [key: string]: number } = {};
+    for (let i = 0; i < months; i++) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - (months - 1 - i));
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      
+      // Count all calves that existed in that month
+      const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+      const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+      
+      const totalCalvesInMonth = await this.calvesRepository
+        .createQueryBuilder('calf')
+        .where('calf.createdAt <= :monthEnd', { monthEnd })
+        .getCount();
+      
+      monthlyTotals[monthKey] = totalCalvesInMonth;
+    }
+    
+    // Initialize result with monthly keys
+    const monthlyDeaths: { [key: string]: number } = {};
+    for (let i = 0; i < months; i++) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - (months - 1 - i));
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      monthlyDeaths[monthKey] = 0;
+    }
+    
+    // Count deaths per month
+    deceasedCalves.forEach(calf => {
+      const deathDate = new Date(calf.updatedAt);
+      const monthKey = `${deathDate.getFullYear()}-${String(deathDate.getMonth() + 1).padStart(2, '0')}`;
+      
+      if (monthlyDeaths[monthKey] !== undefined) {
+        monthlyDeaths[monthKey]++;
+      }
+    });
+    
+    // Convert to array format with mortality rates
+    return Object.entries(monthlyDeaths).map(([monthKey, deathCount]) => {
+      const [year, month] = monthKey.split('-');
+      const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+      const monthName = date.toLocaleString('en-US', { month: 'short' });
+      
+      const totalCalves = monthlyTotals[monthKey] || 1; // Avoid division by zero
+      const mortalityRate = (deathCount / totalCalves) * 100;
+      
+      return {
+        name: `${monthName} ${year}`,
+        value: parseFloat(mortalityRate.toFixed(1))
+      };
+    });
+  }
+
   async searchCalves(params: SearchParams) {
     const { 
       page, 

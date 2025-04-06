@@ -66,6 +66,13 @@ export class CalvesController {
     return this.calvesService.getDailyBirthRate(parsedDays);
   }
 
+  @Get('monthly-mortality-rates')
+  @ApiQuery({ name: 'months', required: false, type: Number, description: 'Number of months to include', example: 6 })
+  async getMonthlyMortalityRates(@Query('months') months?: string) {
+    const parsedMonths = months ? parseInt(months, 10) : 6;
+    return this.calvesService.getMonthlyMortalityRates(parsedMonths);
+  }
+
   @Get('search')
   @ApiOperation({ summary: 'Search and filter calves with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (starts at 1)', example: 1 })
