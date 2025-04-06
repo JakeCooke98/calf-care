@@ -28,7 +28,10 @@ export function useDashboardStats() {
 }
 
 // Hook for chart data
-export function useChartData(chartType: 'health' | 'breed' | 'gender' | 'location' | 'age' | 'birth-rate', days?: number) {
+export function useChartData(
+  chartType: 'health' | 'breed' | 'gender' | 'location' | 'age' | 'birth-rate' | 'mortality-rate', 
+  duration?: number
+) {
   const [data, setData] = useState<ChartDataPoint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -56,7 +59,10 @@ export function useChartData(chartType: 'health' | 'breed' | 'gender' | 'locatio
             result = await dashboardApi.getAgeDistribution();
             break;
           case 'birth-rate':
-            result = await dashboardApi.getDailyBirthRate(days || 7);
+            result = await dashboardApi.getDailyBirthRate(duration || 7);
+            break;
+          case 'mortality-rate':
+            result = await dashboardApi.getMonthlyMortalityRates(duration || 6);
             break;
           default:
             result = [];
@@ -72,7 +78,7 @@ export function useChartData(chartType: 'health' | 'breed' | 'gender' | 'locatio
     };
 
     fetchData();
-  }, [chartType, days]);
+  }, [chartType, duration]);
 
   return { data, isLoading, error };
 }

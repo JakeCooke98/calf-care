@@ -171,6 +171,11 @@ export const calvesApi = {
   getDailyBirthRate: async (days: number = 7): Promise<ChartDataPoint[]> => {
     return fetchApi<ChartDataPoint[]>(`/calves/daily-birth-rate?days=${days}`);
   },
+  
+  // Get monthly mortality rates
+  getMonthlyMortalityRates: async (months: number = 6): Promise<ChartDataPoint[]> => {
+    return fetchApi<ChartDataPoint[]>(`/calves/monthly-mortality-rates?months=${months}`);
+  },
 };
 
 // Dashboard-specific endpoints
@@ -205,6 +210,10 @@ export const dashboardApi = {
   
   getDailyBirthRate: async (days: number = 7): Promise<ChartDataPoint[]> => {
     return fetchApi<ChartDataPoint[]>(`/calves/daily-birth-rate?days=${days}`);
+  },
+  
+  getMonthlyMortalityRates: async (months: number = 6): Promise<ChartDataPoint[]> => {
+    return fetchApi<ChartDataPoint[]>(`/calves/monthly-mortality-rates?months=${months}`);
   },
 };
 
