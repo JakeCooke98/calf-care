@@ -6,10 +6,10 @@ import { CalfHealth } from '@/components/dashboard/calf-health';
 import { AverageWeight } from '@/components/dashboard/average-weight';
 import { BreedDistribution } from '@/components/dashboard/breed-distribution';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
-import NewCalvesToday from '@/components/dashboard/NewCalvesToday';
+import NewCalvesToday from '@/components/dashboard/new-calves-today';
 import GenderDistribution from '@/components/dashboard/gender-distribution';
 import LocationDistribution from '@/components/dashboard/location-distribution';
-import AgeDistribution from '@/components/dashboard/AgeDistribution';
+import { AgeDistribution } from '@/components/dashboard/age-distribution';
 import NewCalvesChart from '@/components/dashboard/NewCalvesChart';
 import MortalityRates from '@/components/dashboard/MortalityRates';
 
