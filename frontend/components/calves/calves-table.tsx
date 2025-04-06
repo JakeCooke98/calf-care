@@ -69,19 +69,24 @@ export function CalvesTable({ searchQuery }: CalvesTableProps) {
       
       // Update local state
       setCalves(prev => 
-        prev.map(c => c.id === calf.id ? updatedCalf : c)
+        prev.map(c => c.id === calf.id ? { ...c, inWatchlist: !c.inWatchlist } : c)
       );
       
+      // Use the current value when showing the message
+      const isCurrentlyInWatchlist = calf.inWatchlist;
+      const actionText = isCurrentlyInWatchlist ? "removed from" : "added to";
+      
+      // Use the original toast API without duration
       toast({
-        title: calf.inWatchlist ? "Removed from watchlist" : "Added to watchlist",
-        description: `${calf.name} has been ${calf.inWatchlist ? "removed from" : "added to"} the watchlist`,
-        variant: "default",
+        title: isCurrentlyInWatchlist ? "Removed from watchlist" : "Added to watchlist",
+        description: `${calf.name} has been ${actionText} the watchlist`,
       });
+      
     } catch (error) {
       console.error("Failed to update watchlist status:", error);
       toast({
         title: "Error",
-        description: `Failed to ${calf.inWatchlist ? "remove from" : "add to"} watchlist`,
+        description: `Failed to update watchlist status`,
         variant: "destructive",
       });
     } finally {

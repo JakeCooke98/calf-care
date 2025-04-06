@@ -57,7 +57,6 @@ export function CalvesTable({ calves, isLoading, searchQuery, onRemove }: Calves
       toast({
         title: "Success",
         description: "Calf removed from watchlist",
-        variant: "default",
       });
 
       // Trigger parent component refresh if provided
