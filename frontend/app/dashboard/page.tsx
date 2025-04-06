@@ -7,7 +7,7 @@ import { AverageWeight } from '@/components/dashboard/average-weight';
 import { BreedDistribution } from '@/components/dashboard/breed-distribution';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import NewCalvesToday from '@/components/dashboard/NewCalvesToday';
-import GenderDistribution from '@/components/dashboard/GenderDistribution';
+import GenderDistribution from '@/components/dashboard/gender-distribution';
 import LocationCharts from '@/components/dashboard/LocationCharts';
 import AgeDistribution from '@/components/dashboard/AgeDistribution';
 import NewCalvesChart from '@/components/dashboard/NewCalvesChart';
