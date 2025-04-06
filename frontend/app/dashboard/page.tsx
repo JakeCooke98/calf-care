@@ -8,7 +8,7 @@ import { BreedDistribution } from '@/components/dashboard/breed-distribution';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import NewCalvesToday from '@/components/dashboard/NewCalvesToday';
 import GenderDistribution from '@/components/dashboard/gender-distribution';
-import LocationCharts from '@/components/dashboard/LocationCharts';
+import LocationDistribution from '@/components/dashboard/location-distribution';
 import AgeDistribution from '@/components/dashboard/AgeDistribution';
 import NewCalvesChart from '@/components/dashboard/NewCalvesChart';
 import MortalityRates from '@/components/dashboard/MortalityRates';
@@ -33,7 +33,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <BreedDistribution />
           <GenderDistribution />
-          <LocationCharts />
+          <LocationDistribution />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
