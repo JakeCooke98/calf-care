@@ -11,31 +11,36 @@ import {
 } from "@/components/ui/table";
 import { Calf, calvesApi } from "@/lib/api-client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { useToast } from "@/lib/use-toast";
 
 interface CalvesTableProps {
   searchQuery: string;
 }
 
 export function CalvesTable({ searchQuery }: CalvesTableProps) {
+  const { toast } = useToast();
   const [calves, setCalves] = useState<Calf[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingWatchlist, setUpdatingWatchlist] = useState<Record<string, boolean>>({});
+
+  const fetchCalves = async () => {
+    try {
+      setIsLoading(true);
+      const data = await calvesApi.getAll();
+      setCalves(data);
+      setError(null);
+    } catch (err) {
+      console.error("Failed to fetch calves:", err);
+      setError("Failed to load calves. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchCalves = async () => {
-      try {
-        setIsLoading(true);
-        const data = await calvesApi.getAll();
-        setCalves(data);
-        setError(null);
-      } catch (err) {
-        console.error("Failed to fetch calves:", err);
-        setError("Failed to load calves. Please try again later.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchCalves();
   }, []);
 
@@ -53,12 +58,43 @@ export function CalvesTable({ searchQuery }: CalvesTableProps) {
     );
   });
 
+  const toggleWatchlist = async (calf: Calf) => {
+    try {
+      setUpdatingWatchlist(prev => ({ ...prev, [calf.id]: true }));
+      
+      // Toggle the watchlist status
+      const updatedCalf = await calvesApi.update(calf.id, { 
+        inWatchlist: !calf.inWatchlist 
+      });
+      
+      // Update local state
+      setCalves(prev => 
+        prev.map(c => c.id === calf.id ? updatedCalf : c)
+      );
+      
+      toast({
+        title: calf.inWatchlist ? "Removed from watchlist" : "Added to watchlist",
+        description: `${calf.name} has been ${calf.inWatchlist ? "removed from" : "added to"} the watchlist`,
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Failed to update watchlist status:", error);
+      toast({
+        title: "Error",
+        description: `Failed to ${calf.inWatchlist ? "remove from" : "add to"} watchlist`,
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingWatchlist(prev => ({ ...prev, [calf.id]: false }));
+    }
+  };
+
   if (error) {
     return (
       <div className="p-4 rounded-md bg-red-50 text-red-500">
         <p>{error}</p>
         <button 
-          onClick={() => window.location.reload()} 
+          onClick={fetchCalves} 
           className="mt-2 text-sm underline"
         >
           Retry
@@ -129,11 +165,27 @@ export function CalvesTable({ searchQuery }: CalvesTableProps) {
                   </span>
                 </TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    calf.inWatchlist ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'
-                  }`}>
-                    {calf.inWatchlist ? 'Watching' : 'Normal'}
-                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex items-center gap-1"
+                    onClick={() => toggleWatchlist(calf)}
+                    disabled={updatingWatchlist[calf.id]}
+                  >
+                    {updatingWatchlist[calf.id] ? (
+                      <Skeleton className="h-4 w-4" />
+                    ) : calf.inWatchlist ? (
+                      <>
+                        <EyeOffIcon className="h-4 w-4 text-purple-600" />
+                        <span className="text-sm text-purple-600">Remove</span>
+                      </>
+                    ) : (
+                      <>
+                        <EyeIcon className="h-4 w-4 text-gray-600" />
+                        <span className="text-sm text-gray-600">Add</span>
+                      </>
+                    )}
+                  </Button>
                 </TableCell>
               </TableRow>
             ))
