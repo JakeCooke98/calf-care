@@ -90,7 +90,7 @@ export const calvesApi = {
   },
   
   // Get calf by ID
-  getById: async (id: number): Promise<Calf> => {
+  getById: async (id: string): Promise<Calf> => {
     return fetchApi<Calf>(`/calves/${id}`);
   },
   
@@ -103,7 +103,7 @@ export const calvesApi = {
   },
   
   // Update calf
-  update: async (id: number, calf: Partial<Calf>): Promise<Calf> => {
+  update: async (id: string, calf: Partial<Calf>): Promise<Calf> => {
     return fetchApi<Calf>(`/calves/${id}`, {
       method: 'PUT',
       body: JSON.stringify(calf),
@@ -111,7 +111,7 @@ export const calvesApi = {
   },
   
   // Delete calf
-  delete: async (id: number): Promise<void> => {
+  delete: async (id: string): Promise<void> => {
     return fetchApi<void>(`/calves/${id}`, {
       method: 'DELETE',
     });

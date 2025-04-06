@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Calf, calvesApi } from '@/lib/api-client';
 
 // Hook for fetching all calves
@@ -62,25 +62,25 @@ export function useWatchlistCalves() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    const fetchWatchlist = async () => {
-      try {
-        setIsLoading(true);
-        const data = await calvesApi.getWatchlist();
-        setCalves(data);
-        setError(null);
-      } catch (err) {
-        console.error("Failed to fetch watchlist:", err);
-        setError(err instanceof Error ? err : new Error('Failed to fetch watchlist'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchWatchlist();
+  const fetchWatchlist = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const data = await calvesApi.getWatchlist();
+      setCalves(data);
+      setError(null);
+    } catch (err) {
+      console.error("Failed to fetch watchlist:", err);
+      setError(err instanceof Error ? err : new Error('Failed to fetch watchlist'));
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  return { calves, isLoading, error };
+  useEffect(() => {
+    fetchWatchlist();
+  }, [fetchWatchlist]);
+
+  return { calves, isLoading, error, refetch: fetchWatchlist };
 }
 
 // Hook for fetching calves by location

@@ -10,7 +10,7 @@ import { CalvesTable } from "@/components/calves/calves-table-watchlist";
 
 export default function WatchlistPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const { calves, isLoading, error } = useWatchlistCalves();
+  const { calves, isLoading, error, refetch } = useWatchlistCalves();
 
   return (
     <>
@@ -38,14 +38,19 @@ export default function WatchlistPage() {
               <div className="p-4 rounded-md bg-red-50 text-red-500">
                 <p>Failed to load watchlist data. Please try again later.</p>
                 <button 
-                  onClick={() => window.location.reload()} 
+                  onClick={refetch} 
                   className="mt-2 text-sm underline"
                 >
                   Retry
                 </button>
               </div>
             ) : (
-              <CalvesTable calves={calves} isLoading={isLoading} searchQuery={searchQuery} />
+              <CalvesTable 
+                calves={calves} 
+                isLoading={isLoading} 
+                searchQuery={searchQuery} 
+                onRemove={refetch}
+              />
             )}
           </CardContent>
         </Card>

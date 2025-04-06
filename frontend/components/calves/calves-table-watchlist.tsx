@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { 
   Table, 
   TableHeader, 
@@ -8,18 +9,29 @@ import {
   TableBody, 
   TableCell 
 } from "@/components/ui/table";
-import { Calf } from "@/lib/api-client";
+import { Calf, calvesApi } from "@/lib/api-client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/lib/use-toast";
 
 interface CalvesTableWatchlistProps {
   calves: Calf[];
   isLoading: boolean;
   searchQuery: string;
+  onRemove?: () => void;
 }
 
-export function CalvesTable({ calves, isLoading, searchQuery }: CalvesTableWatchlistProps) {
+export function CalvesTable({ calves, isLoading, searchQuery, onRemove }: CalvesTableWatchlistProps) {
+  const { toast } = useToast();
+  const [removingCalves, setRemovingCalves] = useState<Record<string, boolean>>({});
+  const [localCalves, setLocalCalves] = useState<Calf[]>(calves);
+
+  // Update local calves when the prop changes
+  if (calves !== localCalves && !isLoading) {
+    setLocalCalves(calves);
+  }
+
   // Updated filter function to include numeric fields
-  const filteredCalves = calves.filter(calf => {
+  const filteredCalves = localCalves.filter(calf => {
     const query = searchQuery.toLowerCase();
     return (
       calf.name.toLowerCase().includes(query) ||
@@ -31,6 +43,38 @@ export function CalvesTable({ calves, isLoading, searchQuery }: CalvesTableWatch
       calf.weight.toString().includes(query)
     );
   });
+
+  const removeFromWatchlist = async (calfId: string) => {
+    try {
+      setRemovingCalves(prev => ({ ...prev, [calfId]: true }));
+      
+      // Call API to update watchlist status
+      await calvesApi.update(calfId, { inWatchlist: false });
+      
+      // Update local state immediately for better UX
+      setLocalCalves(prev => prev.filter(calf => calf.id !== calfId));
+      
+      toast({
+        title: "Success",
+        description: "Calf removed from watchlist",
+        variant: "default",
+      });
+
+      // Trigger parent component refresh if provided
+      if (onRemove) {
+        onRemove();
+      }
+    } catch (error) {
+      console.error("Failed to remove from watchlist:", error);
+      toast({
+        title: "Error",
+        description: "Failed to remove calf from watchlist",
+        variant: "destructive",
+      });
+    } finally {
+      setRemovingCalves(prev => ({ ...prev, [calfId]: false }));
+    }
+  };
 
   return (
     <div className="rounded-md border">
@@ -95,14 +139,11 @@ export function CalvesTable({ calves, isLoading, searchQuery }: CalvesTableWatch
                 </TableCell>
                 <TableCell>
                   <button 
-                    className="text-blue-500 hover:text-blue-700 text-sm"
-                    onClick={() => {
-                      // This would be implemented to remove from watchlist
-                      // Will need a modal confirmation
-                      console.log('Remove from watchlist:', calf.id);
-                    }}
+                    className="text-red-500 hover:text-red-700 text-sm font-medium"
+                    onClick={() => removeFromWatchlist(calf.id)}
+                    disabled={removingCalves[calf.id]}
                   >
-                    Remove
+                    {removingCalves[calf.id] ? "Removing..." : "Remove"}
                   </button>
                 </TableCell>
               </TableRow>
