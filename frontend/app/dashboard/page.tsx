@@ -10,7 +10,7 @@ import NewCalvesToday from '@/components/dashboard/new-calves-today';
 import GenderDistribution from '@/components/dashboard/gender-distribution';
 import LocationDistribution from '@/components/dashboard/location-distribution';
 import { AgeDistribution } from '@/components/dashboard/age-distribution';
-import NewCalvesChart from '@/components/dashboard/NewCalvesChart';
+import { DailyBirthRate } from '@/components/dashboard/daily-birth-rate';
 import MortalityRates from '@/components/dashboard/MortalityRates';
 
 export default function DashboardPage() {
@@ -38,7 +38,7 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AgeDistribution />
-          <NewCalvesChart />
+          <DailyBirthRate />
           <MortalityRates />
         </div>
       </div>

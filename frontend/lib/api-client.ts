@@ -166,6 +166,11 @@ export const calvesApi = {
   getAgeDistribution: async (): Promise<ChartDataPoint[]> => {
     return fetchApi<ChartDataPoint[]>('/calves/age-distribution');
   },
+  
+  // Get daily birth rate
+  getDailyBirthRate: async (days: number = 7): Promise<ChartDataPoint[]> => {
+    return fetchApi<ChartDataPoint[]>(`/calves/daily-birth-rate?days=${days}`);
+  },
 };
 
 // Dashboard-specific endpoints
@@ -196,6 +201,10 @@ export const dashboardApi = {
   
   getAgeDistribution: async (): Promise<ChartDataPoint[]> => {
     return fetchApi<ChartDataPoint[]>('/calves/age-distribution');
+  },
+  
+  getDailyBirthRate: async (days: number = 7): Promise<ChartDataPoint[]> => {
+    return fetchApi<ChartDataPoint[]>(`/calves/daily-birth-rate?days=${days}`);
   },
 };
 
