@@ -3,11 +3,14 @@
 import { useState } from "react";
 import Navigation from '@/app/Navigation';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { WatchlistTable } from "@/components/calves/watchlist-table";
 import { SearchBar } from "@/components/SearchBar";
+import { useWatchlistCalves } from "@/lib/hooks/use-calves";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CalvesTable } from "@/components/calves/calves-table-watchlist";
 
-export default function Watchlist() {
+export default function WatchlistPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const { calves, isLoading, error, refetch } = useWatchlistCalves();
 
   return (
     <>
@@ -19,10 +22,36 @@ export default function Watchlist() {
         </div>
         <Card>
           <CardHeader>
-            <CardTitle>Calves Requiring Attention</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              <span>Calves Requiring Attention</span>
+              {isLoading ? (
+                <Skeleton className="h-4 w-16" />
+              ) : (
+                <span className="text-sm font-normal text-muted-foreground">
+                  {calves.length} calves
+                </span>
+              )}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <WatchlistTable searchQuery={searchQuery} />
+            {error ? (
+              <div className="p-4 rounded-md bg-red-50 text-red-500">
+                <p>Failed to load watchlist data. Please try again later.</p>
+                <button 
+                  onClick={refetch} 
+                  className="mt-2 text-sm underline"
+                >
+                  Retry
+                </button>
+              </div>
+            ) : (
+              <CalvesTable 
+                calves={calves} 
+                isLoading={isLoading} 
+                searchQuery={searchQuery} 
+                onRemove={refetch}
+              />
+            )}
           </CardContent>
         </Card>
       </div>

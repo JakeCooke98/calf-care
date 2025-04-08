@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { 
   Table, 
   TableHeader, 
@@ -11,41 +11,27 @@ import {
 } from "@/components/ui/table";
 import { Calf, calvesApi } from "@/lib/api-client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useToast } from "@/lib/use-toast";
 
-interface CalvesTableProps {
+interface CalvesTableWatchlistProps {
+  calves: Calf[];
+  isLoading: boolean;
   searchQuery: string;
+  onRemove?: () => void;
 }
 
-export function CalvesTable({ searchQuery }: CalvesTableProps) {
+export function CalvesTable({ calves, isLoading, searchQuery, onRemove }: CalvesTableWatchlistProps) {
   const { toast } = useToast();
-  const [calves, setCalves] = useState<Calf[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [updatingWatchlist, setUpdatingWatchlist] = useState<Record<string, boolean>>({});
+  const [removingCalves, setRemovingCalves] = useState<Record<string, boolean>>({});
+  const [localCalves, setLocalCalves] = useState<Calf[]>(calves);
 
-  const fetchCalves = async () => {
-    try {
-      setIsLoading(true);
-      const data = await calvesApi.getAll();
-      setCalves(data);
-      setError(null);
-    } catch (err) {
-      console.error("Failed to fetch calves:", err);
-      setError("Failed to load calves. Please try again later.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCalves();
-  }, []);
+  // Update local calves when the prop changes
+  if (calves !== localCalves && !isLoading) {
+    setLocalCalves(calves);
+  }
 
   // Updated filter function to include numeric fields
-  const filteredCalves = calves.filter(calf => {
+  const filteredCalves = localCalves.filter(calf => {
     const query = searchQuery.toLowerCase();
     return (
       calf.name.toLowerCase().includes(query) ||
@@ -58,55 +44,36 @@ export function CalvesTable({ searchQuery }: CalvesTableProps) {
     );
   });
 
-  const toggleWatchlist = async (calf: Calf) => {
+  const removeFromWatchlist = async (calfId: string) => {
     try {
-      setUpdatingWatchlist(prev => ({ ...prev, [calf.id]: true }));
+      setRemovingCalves(prev => ({ ...prev, [calfId]: true }));
       
-      // Toggle the watchlist status
-      const updatedCalf = await calvesApi.update(calf.id, { 
-        inWatchlist: !calf.inWatchlist 
-      });
+      // Call API to update watchlist status
+      await calvesApi.update(calfId, { inWatchlist: false });
       
-      // Update local state
-      setCalves(prev => 
-        prev.map(c => c.id === calf.id ? { ...c, inWatchlist: !c.inWatchlist } : c)
-      );
+      // Update local state immediately for better UX
+      setLocalCalves(prev => prev.filter(calf => calf.id !== calfId));
       
-      // Use the current value when showing the message
-      const isCurrentlyInWatchlist = calf.inWatchlist;
-      const actionText = isCurrentlyInWatchlist ? "removed from" : "added to";
-      
-      // Use the original toast API without duration
       toast({
-        title: isCurrentlyInWatchlist ? "Removed from watchlist" : "Added to watchlist",
-        description: `${calf.name} has been ${actionText} the watchlist`,
+        title: "Success",
+        description: "Calf removed from watchlist",
       });
-      
+
+      // Trigger parent component refresh if provided
+      if (onRemove) {
+        onRemove();
+      }
     } catch (error) {
-      console.error("Failed to update watchlist status:", error);
+      console.error("Failed to remove from watchlist:", error);
       toast({
         title: "Error",
-        description: `Failed to update watchlist status`,
+        description: "Failed to remove calf from watchlist",
         variant: "destructive",
       });
     } finally {
-      setUpdatingWatchlist(prev => ({ ...prev, [calf.id]: false }));
+      setRemovingCalves(prev => ({ ...prev, [calfId]: false }));
     }
   };
-
-  if (error) {
-    return (
-      <div className="p-4 rounded-md bg-red-50 text-red-500">
-        <p>{error}</p>
-        <button 
-          onClick={fetchCalves} 
-          className="mt-2 text-sm underline"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div className="rounded-md border">
@@ -120,13 +87,13 @@ export function CalvesTable({ searchQuery }: CalvesTableProps) {
             <TableHead>Breed</TableHead>
             <TableHead>Location</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Watchlist</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
             // Loading skeleton
-            Array(5).fill(0).map((_, index) => (
+            Array(3).fill(0).map((_, index) => (
               <TableRow key={`loading-${index}`}>
                 {Array(8).fill(0).map((_, cellIndex) => (
                   <TableCell key={`cell-${index}-${cellIndex}`}>
@@ -138,7 +105,7 @@ export function CalvesTable({ searchQuery }: CalvesTableProps) {
           ) : filteredCalves.length === 0 ? (
             <TableRow>
               <TableCell colSpan={8} className="text-center py-6 text-muted-foreground">
-                No calves found.
+                No calves in watchlist{searchQuery ? " matching search criteria" : ""}.
               </TableCell>
             </TableRow>
           ) : (
@@ -170,27 +137,13 @@ export function CalvesTable({ searchQuery }: CalvesTableProps) {
                   </span>
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center gap-1"
-                    onClick={() => toggleWatchlist(calf)}
-                    disabled={updatingWatchlist[calf.id]}
+                  <button 
+                    className="text-red-500 hover:text-red-700 text-sm font-medium"
+                    onClick={() => removeFromWatchlist(calf.id)}
+                    disabled={removingCalves[calf.id]}
                   >
-                    {updatingWatchlist[calf.id] ? (
-                      <Skeleton className="h-4 w-4" />
-                    ) : calf.inWatchlist ? (
-                      <>
-                        <EyeOffIcon className="h-4 w-4 text-purple-600" />
-                        <span className="text-sm text-purple-600">Remove</span>
-                      </>
-                    ) : (
-                      <>
-                        <EyeIcon className="h-4 w-4 text-gray-600" />
-                        <span className="text-sm text-gray-600">Add</span>
-                      </>
-                    )}
-                  </Button>
+                    {removingCalves[calf.id] ? "Removing..." : "Remove"}
+                  </button>
                 </TableCell>
               </TableRow>
             ))
@@ -199,4 +152,4 @@ export function CalvesTable({ searchQuery }: CalvesTableProps) {
       </Table>
     </div>
   );
-}
+} 

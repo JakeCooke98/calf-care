@@ -1,21 +1,17 @@
-import { Suspense } from 'react';
-import dynamic from 'next/dynamic';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import TotalCalves from '@/components/dashboard/TotalCalves';
-import CalfHealth from '@/components/dashboard/CalfHealth';
-import NewCalvesToday from '@/components/dashboard/NewCalvesToday';
-import AverageWeight from '@/components/dashboard/AverageWeight';
-import TodoList from '@/components/dashboard/TodoList';
-import { DatePickerWithRange } from '@/components/ui/date-range-picker';
-import Navigation from '@/app/Navigation';
+"use client";
 
-const BreedDistribution = dynamic(() => import('@/components/dashboard/BreedDistribution'), { ssr: false });
-const GenderDistribution = dynamic(() => import('@/components/dashboard/GenderDistribution'), { ssr: false });
-const LocationCharts = dynamic(() => import('@/components/dashboard/LocationCharts'), { ssr: false });
-const AgeDistribution = dynamic(() => import('@/components/dashboard/AgeDistribution'), { ssr: false });
-const NewCalvesChart = dynamic(() => import('@/components/dashboard/NewCalvesChart'), { ssr: false });
-const MortalityRates = dynamic(() => import('@/components/dashboard/MortalityRates'), { ssr: false });
+import Navigation from '@/app/Navigation';
+import { TotalCalves } from '@/components/dashboard/total-calves';
+import { CalfHealth } from '@/components/dashboard/calf-health';
+import { AverageWeight } from '@/components/dashboard/average-weight';
+import { BreedDistribution } from '@/components/dashboard/breed-distribution';
+import { DatePickerWithRange } from '@/components/ui/date-range-picker';
+import NewCalvesToday from '@/components/dashboard/new-calves-today';
+import GenderDistribution from '@/components/dashboard/gender-distribution';
+import LocationDistribution from '@/components/dashboard/location-distribution';
+import { AgeDistribution } from '@/components/dashboard/age-distribution';
+import { DailyBirthRate } from '@/components/dashboard/daily-birth-rate';
+import { MonthlyMortalityRate } from '@/components/dashboard/monthly-mortality-rate';
 
 export default function DashboardPage() {
   return (
@@ -37,18 +33,14 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <BreedDistribution />
           <GenderDistribution />
-          <LocationCharts />
+          <LocationDistribution />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AgeDistribution />
-          <NewCalvesChart />
-          <MortalityRates />
+          <DailyBirthRate />
+          <MonthlyMortalityRate />
         </div>
-        {/* TODO: Implement to do list functionality */}
-        {/* <div className="mt-6">
-          <TodoList />
-        </div> */}
       </div>
     </>
   );

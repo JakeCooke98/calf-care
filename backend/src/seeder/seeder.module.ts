@@ -1,12 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
-import { CalvesModule } from './calves/calves.module';
-import { SeederModule } from './seeder/seeder.module';
+import { SeederService } from './seeder.service';
+import { SeederCommand } from './seeder.command';
+import { Calf } from '../calves/entities/calf.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -25,12 +22,8 @@ import { SeederModule } from './seeder/seeder.module';
       }),
       inject: [ConfigService],
     }),
-    UsersModule,
-    AuthModule,
-    CalvesModule,
-    SeederModule
+    TypeOrmModule.forFeature([Calf]),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [SeederService, SeederCommand],
 })
-export class AppModule {}
+export class SeederModule {} 

@@ -77,6 +77,20 @@ Calf Care is a comprehensive management system designed to help dairy farmers an
      ```
    - Check docker logs to ensure DB has booted up sucessfully 
 
+6. Seed the database with test data (optional):
+   ```
+   cd backend
+   
+   # Seed 1000 calves (default)
+   npm run seed
+   
+   # Seed a specific number of calves
+   npm run seed -- --count=500
+   
+   # Clear existing data before seeding
+   npm run seed:clear
+   ```
+
 7. Start the development servers:
    
    Backend:
