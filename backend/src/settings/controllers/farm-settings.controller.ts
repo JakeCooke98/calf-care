@@ -7,6 +7,7 @@ import { FarmSettingsService } from '../services/farm-settings.service';
 import { UpdateFarmSettingsDto } from '../dto/update-farm-settings.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Request } from 'express';
+import { AuthUser } from '../../types';
 
 @ApiTags('farm-settings')
 @ApiBearerAuth()
@@ -19,7 +20,7 @@ export class FarmSettingsController {
   @ApiOperation({ summary: 'Get farm settings for the current user' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Farm settings retrieved successfully' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
-  async getFarmSettings(@Req() req: Request & { user: Express.User }) {
+  async getFarmSettings(@Req() req: Request & { user: AuthUser }) {
     // The user ID is attached to the request by the JwtAuthGuard
     const userId = req.user.id;
     return this.farmSettingsService.findOne(userId);
@@ -33,7 +34,7 @@ export class FarmSettingsController {
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden - requires Farm Manager role' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
   async updateFarmSettings(
-    @Req() req: Request & { user: Express.User },
+    @Req() req: Request & { user: AuthUser },
     @Body() updateFarmSettingsDto: UpdateFarmSettingsDto,
   ) {
     const userId = req.user.id;

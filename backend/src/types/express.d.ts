@@ -9,4 +9,7 @@ declare global {
       isActive: boolean;
     }
   }
-} 
+}
+
+// This empty export is required to make TypeScript treat this file as a module
+export {}; 

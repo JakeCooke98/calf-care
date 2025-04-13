@@ -37,6 +37,7 @@ export class User {
   @Column({ nullable: true })
   lastLogin: Date;
 
+  // Temporarily comment out for seeding
   @OneToMany(() => FarmLocation, farmLocation => farmLocation.manager)
   managedLocations: FarmLocation[];
 

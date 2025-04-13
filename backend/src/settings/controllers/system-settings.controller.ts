@@ -7,6 +7,7 @@ import { SystemSettingsService } from '../services/system-settings.service';
 import { UpdateSystemSettingsDto } from '../dto/update-system-settings.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Request } from 'express';
+import { AuthUser } from '../../types';
 
 @ApiTags('system-settings')
 @ApiBearerAuth()
@@ -19,7 +20,7 @@ export class SystemSettingsController {
   @ApiOperation({ summary: 'Get system settings for the current user' })
   @ApiResponse({ status: HttpStatus.OK, description: 'System settings retrieved successfully' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
-  async getSystemSettings(@Req() req: Request & { user: Express.User }) {
+  async getSystemSettings(@Req() req: Request & { user: AuthUser }) {
     const userId = req.user.id;
     return this.systemSettingsService.findOne(userId);
   }
@@ -32,7 +33,7 @@ export class SystemSettingsController {
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden - requires Farm Manager role' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
   async updateSystemSettings(
-    @Req() req: Request & { user: Express.User },
+    @Req() req: Request & { user: AuthUser },
     @Body() updateSystemSettingsDto: UpdateSystemSettingsDto,
   ) {
     const userId = req.user.id;

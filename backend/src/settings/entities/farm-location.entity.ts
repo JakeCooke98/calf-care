@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
 @Entity('farm_locations')
@@ -30,7 +30,9 @@ export class FarmLocation {
   @Column({ type: 'text', nullable: true })
   notes: string;
 
-  @ManyToOne(() => User, user => user.managedLocations)
+  // Temporarily comment out relationship for seeding
+  @ManyToOne(() => User, user => user.managedLocations, { nullable: true })
+  @JoinColumn({ name: 'managerId' })
   manager: User;
 
   @Column({ nullable: true })
