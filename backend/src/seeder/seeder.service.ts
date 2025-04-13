@@ -3,12 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Calf } from '../calves/entities/calf.entity';
 import { faker } from '@faker-js/faker';
+import { SettingsSeeder } from './settings.seeder';
 
 @Injectable()
 export class SeederService {
   constructor(
     @InjectRepository(Calf)
     private readonly calvesRepository: Repository<Calf>,
+    private readonly settingsSeeder: SettingsSeeder,
   ) {}
 
   /**
@@ -130,7 +132,12 @@ export class SeederService {
    * Seed the database with a specified number of calf records
    */
   async seed(count: number): Promise<void> {
-    console.log(`Starting to seed ${count} calves...`);
+    console.log('Starting database seeding...');
+    
+    // First seed the settings (breeds, health statuses, etc.) which calves depend on
+    await this.seedSettings();
+    
+    console.log(`Now seeding ${count} calves...`);
     
     // Generate calves in batches to avoid memory issues
     const batchSize = 100;
@@ -147,6 +154,13 @@ export class SeederService {
     }
     
     console.log('Seeding completed successfully!');
+  }
+
+  /**
+   * Seed the settings data
+   */
+  async seedSettings(): Promise<void> {
+    await this.settingsSeeder.seed();
   }
 
   /**

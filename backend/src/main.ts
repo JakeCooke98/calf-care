@@ -21,6 +21,7 @@ async function bootstrap() {
     .setTitle('Calf Care API')
     .setDescription('The Calf Care API')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

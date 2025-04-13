@@ -4,6 +4,8 @@ import { SeederService } from './seeder.service';
 import { SeederCommand } from './seeder.command';
 import { Calf } from '../calves/entities/calf.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { SettingsModule } from '../settings/settings.module';
+import { SettingsSeeder } from './settings.seeder';
 
 @Module({
   imports: [
@@ -23,7 +25,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([Calf]),
+    SettingsModule,
   ],
-  providers: [SeederService, SeederCommand],
+  providers: [SeederService, SeederCommand, SettingsSeeder],
 })
 export class SeederModule {} 
