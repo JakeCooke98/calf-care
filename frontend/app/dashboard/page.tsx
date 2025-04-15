@@ -1,5 +1,7 @@
 "use client";
 
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
 import Navigation from '@/app/Navigation';
 import { TotalCalves } from '@/components/dashboard/total-calves';
 import { CalfHealth } from '@/components/dashboard/calf-health';
@@ -14,6 +16,21 @@ import { DailyBirthRate } from '@/components/dashboard/daily-birth-rate';
 import { MonthlyMortalityRate } from '@/components/dashboard/monthly-mortality-rate';
 
 export default function DashboardPage() {
+  const { data: session, status } = useSession();
+  
+  useEffect(() => {
+    console.log("Dashboard session status:", status);
+    console.log("Dashboard session data:", session);
+  }, [session, status]);
+
+  if (status === "loading") {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
+
+  if (status === "unauthenticated") {
+    return <div className="flex items-center justify-center h-screen">Not authenticated. Please sign in.</div>;
+  }
+
   return (
     <>
       <Navigation />

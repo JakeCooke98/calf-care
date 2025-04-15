@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import Link from "next/link"
+import { Suspense } from "react"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
@@ -44,7 +45,9 @@ export default function SignUpPage() {
               Enter your details below to create your account
             </p>
           </div>
-          <UserAuthForm isSignUp={true} />
+          <Suspense fallback={<div>Loading...</div>}>
+            <UserAuthForm isSignUp={true} />
+          </Suspense>
           <p className="px-8 text-center text-sm text-muted-foreground">
             By clicking continue, you agree to our{" "}
             <Link
