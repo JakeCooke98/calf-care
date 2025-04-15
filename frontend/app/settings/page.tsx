@@ -1,11 +1,11 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserManagement } from "@/components/settings/UserManagement";
-import { HealthStatuses } from "@/components/settings/HealthStatuses";
-import { SystemSettings } from "@/components/settings/SystemSettings";
-import { FarmLocations } from "@/components/settings/FarmLocations";
-import { AnimalManagement } from "@/components/settings/AnimalManagement";
-import { BreedRegistry } from "@/components/settings/BreedRegistry";
-import { AdminHeader } from "@/components/settings/AdminHeader";
+import { HealthStatuses } from "@/components/settings/health-statuses";
+import { SystemSettings } from "@/components/settings/system-settings";
+import { FarmLocations } from "@/components/settings/farm-locations";
+import { AnimalManagement } from "@/components/settings/animal-management";
+import { BreedRegistry } from "@/components/settings/breed-registry";
+import { AdminHeader } from "@/components/settings/admin-header";
 
 export default function SettingsPage() {
   return (

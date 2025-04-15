@@ -38,8 +38,8 @@ export function UserAuthForm({ className, isSignUp = false, ...props }: UserAuth
   async function onSubmit(data: FormData) {
     setIsLoading(true)
 
-    if (isSignUp) {
-      try {
+    try {
+      if (isSignUp) {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -50,55 +50,53 @@ export function UserAuthForm({ className, isSignUp = false, ...props }: UserAuth
           }),
         });
 
-        if (response.ok) {
-          // Automatically sign in the user after successful signup
-          const result = await signIn("credentials", {
-            email: data.email.toLowerCase(),
-            password: data.password,
-            redirect: false,
-          })
-
-          if (result?.error) {
-            throw new Error("Failed to sign in after signup")
-          }
-
-          router.push("/dashboard")
-        } else {
+        if (!response.ok) {
           const errorData = await response.json()
           throw new Error(errorData.message || "Sign up failed")
         }
-      } catch (error) {
-        console.error("Sign up error:", error)
-        toast({
-          title: "Account creation failed",
-          description: error instanceof Error ? error.message : "An unexpected error occurred. Please try again.",
-          variant: "destructive",
+
+        // Automatically sign in the user after successful signup
+        const signInResult = await signIn("credentials", {
+          email: data.email.toLowerCase(),
+          password: data.password,
+          redirect: false,
         })
-      }
-    } else {
-      try {
+
+        if (signInResult?.error) {
+          throw new Error("Failed to sign in after signup")
+        }
+      } else {
+        console.log("Attempting to sign in with:", data.email.toLowerCase())
         const result = await signIn("credentials", {
           email: data.email.toLowerCase(),
           password: data.password,
           redirect: false,
         })
         
+        console.log("Sign in result:", result)
+        
         if (result?.error) {
           throw new Error(result.error)
         }
-
-        router.push("/dashboard")
-      } catch (error) {
-        console.error("Sign in error:", error)
-        toast({
-          title: "Sign in failed",
-          description: error instanceof Error ? error.message : "An unexpected error occurred. Please try again.",
-          variant: "destructive",
-        })
       }
-    }
 
-    setIsLoading(false)
+      console.log("Authentication successful, redirecting to dashboard")
+      // Try using a hard redirect instead of router.push which might be failing silently
+      window.location.href = "/dashboard"
+      // Fallback to router.push after a short delay if the redirect doesn't happen
+      setTimeout(() => {
+        router.push("/dashboard")
+      }, 500)
+    } catch (error) {
+      console.error("Authentication error:", error)
+      toast({
+        title: isSignUp ? "Account creation failed" : "Sign in failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (

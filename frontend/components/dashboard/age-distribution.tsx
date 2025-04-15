@@ -16,12 +16,12 @@ export function AgeDistribution() {
     if (!data || data.length === 0) return [];
     
     // Define the order for age ranges
-    const ageOrder = {
-      '0-30 days': 1,
-      '31-90 days': 2, 
-      '91-180 days': 3,
-      '181-365 days': 4,
-      '366+ days': 5
+    const ageOrder: Record<string, number> = {
+      '0-30 days': 0,
+      '31-90 days': 1,
+      '91-180 days': 2,
+      '181-365 days': 3,
+      '366+ days': 4
     };
     
     // Sort by age range order

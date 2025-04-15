@@ -2,8 +2,51 @@
  * API client for backend communication
  */
 
-// Base configuration
+import axios from 'axios';
+import { getSession } from 'next-auth/react';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080';
+
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Request interceptor to add auth token to requests
+apiClient.interceptors.request.use(
+  async (config) => {
+    if (typeof window !== 'undefined') {
+      const session = await getSession();
+      
+      if (session?.accessToken) {
+        config.headers['Authorization'] = `Bearer ${session.accessToken}`;
+      }
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor to handle errors
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Handle 401 Unauthorized errors
+    if (error.response?.status === 401) {
+      // Let NextAuth handle the redirect to login
+      if (typeof window !== 'undefined') {
+        window.location.href = '/signin';
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);
 
 // Error handling utility
 class ApiError extends Error {
@@ -223,8 +266,4 @@ export const authApi = {
   // ...
 };
 
-export default {
-  calves: calvesApi,
-  auth: authApi,
-  dashboard: dashboardApi,
-}; 
+export default apiClient; 
